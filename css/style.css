@@ -1,0 +1,26 @@
+/*
+ * 全ページ共通の補足スタイル
+ * 基本のデザインは Tailwind CSS（CDN）で行い、
+ * Tailwind だけでは対応しづらい細かな調整をここに書く。
+ */
+
+/* 日本語が読みやすいフォントを優先して指定する */
+body {
+  font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+}
+
+/* バリデーションエラー時、入力欄を赤い枠で強調する（js/main.js から付与） */
+.input-error {
+  border-color: #ef4444 !important;      /* 赤い枠線 */
+  background-color: #fef2f2;             /* うっすら赤い背景 */
+}
+
+/* エラーメッセージはアニメーションでふわっと表示する */
+.error-message {
+  animation: fadeIn 0.15s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-2px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
