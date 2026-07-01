@@ -1,6 +1,6 @@
 <?php
 // メール内のURL（verify.php?token=xxxx）からトークンを受け取り、
-// CSVと照合して status を 'active'（本登録済み）に更新する。
+// DBと照合して status を 'active'（本登録済み）に更新する。
 session_start();
 
 // ① URLからトークンを受け取る。なければエラー。
@@ -9,64 +9,45 @@ if ($token === '') {
     $errorMessage = 'トークンが指定されていません。';
 }
 
-$csvFile = __DIR__ . '/data/users.csv';
-
-// CSVファイルが存在しない場合はエラー
-if (!isset($errorMessage) && !file_exists($csvFile)) {
-    $errorMessage = '登録データが見つかりません。';
-}
-
 // 照合結果のフラグ（一致したかどうか）
 $matched = false;
 
 if (!isset($errorMessage)) {
-    // ② CSVを読み込み、トークンが一致する行の status を 'active' に書き換える
+    // ② DBに接続する（PDOを使用）
+    $dbn  = 'mysql:dbname=member_system_db;charset=utf8mb4;port=3306;host=localhost';
+    $user_db = 'root';
+    $pwd  = '';
 
-    // ファイルを読み書き両用（'r+'）で開く
-    $fp = fopen($csvFile, 'r+');
-    if ($fp === false) {
-        $errorMessage = 'CSVファイルを開けませんでした。';
-    } else {
-        // 書き換え中に他の処理が割り込まないようロックをかける
-        flock($fp, LOCK_EX);
+    try {
+        $pdo = new PDO($dbn, $user_db, $pwd);
+    } catch (PDOException $e) {
+        echo json_encode(["db error" => "{$e->getMessage()}"]);
+        exit();
+    }
 
-        // CSVの全行をいったん配列に読み込む
-        $rows = [];
-        while (($data = fgetcsv($fp)) !== false) {
-            $rows[] = $data;
-        }
+    try {
+        // ③ SELECT文でトークンが一致するレコードを探す（バインド変数で安全に照合）
+        $selectSql = 'SELECT * FROM users WHERE token = :token';
+        $stmt = $pdo->prepare($selectSql);
+        $stmt->bindValue(':token', $token, PDO::PARAM_STR);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // 各行をチェックして、トークン列（4列目＝添字3）が一致する行を探す
-        foreach ($rows as $i => $row) {
-            // ヘッダー行やカラム数が足りない行はスキップ
-            if (!isset($row[3]) || $row[3] === 'token') {
-                continue;
-            }
-            if (hash_equals($row[3], $token)) {
-                // status列（5列目＝添字4）を 'active' に更新する
-                $rows[$i][4] = 'active';
-                $matched = true;
-                break;
-            }
-        }
-
-        if ($matched) {
-            // 書き換えた内容でファイルを丸ごと上書きする
-            // いったんファイルの中身を空にして先頭から書き直す
-            rewind($fp);
-            ftruncate($fp, 0);
-            foreach ($rows as $row) {
-                fputcsv($fp, $row);
-            }
-        }
-
-        // ロックを解除して閉じる
-        flock($fp, LOCK_UN);
-        fclose($fp);
-
-        if (!$matched) {
+        if ($result) {
+            // ④ 一致したら UPDATE文で status を 'active' に更新する
+            // 【重要】WHERE を必ず指定する（忘れると全レコードが更新される）
+            $updateSql = 'UPDATE users SET status = \'active\', updated_at = now() WHERE token = :token';
+            $stmt = $pdo->prepare($updateSql);
+            $stmt->bindValue(':token', $token, PDO::PARAM_STR);
+            $stmt->execute();
+            $matched = true;
+        } else {
             $errorMessage = 'トークンが一致しませんでした。URLが正しいか確認してください。';
         }
+    } catch (PDOException $e) {
+        // 照合・更新に失敗したらエラー内容を表示する
+        echo json_encode(["db error" => "{$e->getMessage()}"]);
+        exit();
     }
 }
 

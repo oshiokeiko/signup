@@ -22,37 +22,36 @@ $password = $_SESSION['password'];
 // ② 認証トークン（推測されにくいランダムな文字列）を生成する
 $token = bin2hex(random_bytes(32));
 
-// 登録日時（現在時刻）を作成する
-$created_at = date('Y-m-d H:i:s');
+// ③ 仮登録データをDB（MySQL）に保存する -----------------------------------------
+// DBに接続する（PDOを使用）
+$dbn  = 'mysql:dbname=member_system_db;charset=utf8mb4;port=3306;host=localhost';
+$user_db = 'root';
+$pwd  = '';
 
-// ③ 仮登録データをCSVに保存する -------------------------------------------------
-// 保存先：data/users.csv
-$csvFile = __DIR__ . '/data/users.csv';
-
-// CSVに書き込む1行ぶんのデータ（カラム順：name, email, password, token, status, created_at）
-// status は仮登録を表す 'pending' で保存する
-$row = [$name, $email, $password, $token, 'pending', $created_at];
-
-// ファイルを追記モード（'a'）で開く。なければ自動で作成される。
-$fp = fopen($csvFile, 'a');
-if ($fp === false) {
-    exit('CSVファイルを開けませんでした。data フォルダの権限を確認してください。');
+try {
+    $pdo = new PDO($dbn, $user_db, $pwd);
+} catch (PDOException $e) {
+    echo json_encode(["db error" => "{$e->getMessage()}"]);
+    exit();
 }
 
-// 同時書き込みでデータが壊れないようにロックをかける
-flock($fp, LOCK_EX);
-
-// ファイルが空（＝初回）ならヘッダー行を先に書き込む
-if (filesize($csvFile) === 0) {
-    fputcsv($fp, ['name', 'email', 'password', 'token', 'status', 'created_at']);
+// INSERT文で仮登録データを保存する
+// ・ユーザー入力値は直接埋め込まず、必ずバインド変数（:name など）を使う（SQLインジェクション対策）
+// ・status は仮登録を表す 'pending'、日時は now() でDB側の現在時刻を入れる
+try {
+    $sql = 'INSERT INTO users (id, name, email, password, token, status, created_at, updated_at)
+            VALUES (NULL, :name, :email, :password, :token, \'pending\', now(), now())';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':name',     $name,     PDO::PARAM_STR);
+    $stmt->bindValue(':email',    $email,    PDO::PARAM_STR);
+    $stmt->bindValue(':password', $password, PDO::PARAM_STR);
+    $stmt->bindValue(':token',    $token,    PDO::PARAM_STR);
+    $stmt->execute();
+} catch (PDOException $e) {
+    // 保存に失敗したら処理を止めてエラー内容を表示する
+    echo json_encode(["db error" => "{$e->getMessage()}"]);
+    exit();
 }
-
-// データ行を書き込む（fputcsv はカンマ区切り・改行を自動でやってくれる）
-fputcsv($fp, $row);
-
-// ロックを解除してファイルを閉じる
-flock($fp, LOCK_UN);
-fclose($fp);
 
 // ④ 認証URL付きのメールを送信する -----------------------------------------------
 // 現在アクセスしているホスト（localhost など）と、このファイルのある場所から

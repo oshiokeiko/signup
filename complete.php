@@ -32,11 +32,6 @@
        class="inline-block mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
       トップへ戻る
     </a>
-
-    <!-- 学習用：登録された一覧（管理ページ）へのリンク -->
-    <div class="mt-6">
-      <a href="list.php" class="inline-block text-blue-600 hover:underline text-sm">登録一覧を見る（管理用）</a>
-    </div>
   </div>
 
 </body>
