@@ -13,17 +13,8 @@ if ($token === '') {
 $matched = false;
 
 if (!isset($errorMessage)) {
-    // ② DBに接続する（PDOを使用）
-    $dbn  = 'mysql:dbname=member_system_db;charset=utf8mb4;port=3306;host=localhost';
-    $user_db = 'root';
-    $pwd  = '';
-
-    try {
-        $pdo = new PDO($dbn, $user_db, $pwd);
-    } catch (PDOException $e) {
-        echo json_encode(["db error" => "{$e->getMessage()}"]);
-        exit();
-    }
+    // ② DBに接続する。db_config.php（Git管理外）を読み込むと $pdo が使える
+    require __DIR__ . '/db_config.php';
 
     try {
         // ③ SELECT文でトークンが一致するレコードを探す（バインド変数で安全に照合）

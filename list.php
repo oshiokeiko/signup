@@ -2,22 +2,14 @@
 // 管理・確認用のユーザー一覧画面。DB（users テーブル）の中身を表として表示する。
 // ※ 開発確認用のページなので、本番ではアクセス制限をかける想定。
 
-// DBに接続する（PDOを使用）
-$dbn  = 'mysql:dbname=member_system_db;charset=utf8mb4;port=3306;host=localhost';
-$user_db = 'root';
-$pwd  = '';
-
-try {
-    $pdo = new PDO($dbn, $user_db, $pwd);
-} catch (PDOException $e) {
-    echo json_encode(["db error" => "{$e->getMessage()}"]);
-    exit();
-}
+// DBに接続する。db_config.php（Git管理外）を読み込むと $pdo が使える
+require __DIR__ . '/db_config.php';
 
 // SELECT文で登録済みユーザーを新しい順に取得する
+// ※ deleted_at が NULL のもの（＝削除されていないもの）だけを表示する
 $users = [];
 try {
-    $sql = 'SELECT * FROM users ORDER BY created_at DESC';
+    $sql = 'SELECT * FROM users WHERE deleted_at IS NULL ORDER BY created_at DESC';
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     // 結果は連想配列（カラム名で取り出せる形）でまとめて受け取る
@@ -59,6 +51,7 @@ try {
               <th class="border-b px-3 py-2">パスワード</th>
               <th class="border-b px-3 py-2">状態</th>
               <th class="border-b px-3 py-2">登録日時</th>
+              <th class="border-b px-3 py-2">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -81,6 +74,11 @@ try {
                   ?>
                 </td>
                 <td class="border-b px-3 py-2 whitespace-nowrap"><?php echo htmlspecialchars($user['created_at'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
+                <td class="border-b px-3 py-2 whitespace-nowrap">
+                  <!-- id は数値なので (int) で整数に変換してからURLに埋め込む -->
+                  <a href="member_detail.php?id=<?php echo (int)($user['id'] ?? 0); ?>"
+                     class="text-blue-600 hover:underline">詳細</a>
+                </td>
               </tr>
             <?php endforeach; ?>
           </tbody>

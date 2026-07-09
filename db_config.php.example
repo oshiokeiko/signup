@@ -1,0 +1,36 @@
+<?php
+// ============================================================
+//  データベース接続情報の【見本】
+//
+//  このファイルをコピーして「db_config.php」という名前で保存し、
+//  自分の環境に合わせて値を書き換えてください。
+//  （db_config.php は Git 管理外なので公開されません）
+//
+//  require で読み込むと、$pdo（接続済み）が使えます。
+//  アクセス元が localhost かどうかで、接続先を自動で切り替えます。
+// ============================================================
+
+// 今アクセスされているホスト名
+$host_name = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+if (strpos($host_name, 'localhost') !== false || strpos($host_name, '127.0.0.1') !== false) {
+    // ---- ローカル（自分のPC・XAMPP）用 ----
+    $db_name = 'あなたのローカルDB名';   // 例: member_system_db
+    $db_host = 'localhost';
+    $db_id   = 'root';
+    $db_pw   = '';                       // XAMPPは空でOK
+} else {
+    // ---- 本番（さくら等）用 ----
+    $db_name = 'あなたの本番DB名';        // 例: mydb（さくらはDB名と同じことが多い）
+    $db_host = 'あなたの本番DBホスト';     // 例: mysqlXXX.db.sakura.ne.jp
+    $db_id   = 'あなたの本番ユーザー名';
+    $db_pw   = 'あなたの本番パスワード';
+}
+
+// try-catch でデータベースに接続する
+try {
+    $server_info = 'mysql:dbname=' . $db_name . ';charset=utf8mb4;host=' . $db_host;
+    $pdo = new PDO($server_info, $db_id, $db_pw);
+} catch (PDOException $e) {
+    exit('DB Connection Error:' . $e->getMessage());
+}

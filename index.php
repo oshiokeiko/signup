@@ -79,6 +79,8 @@ $email = isset($_SESSION['email']) ? htmlspecialchars($_SESSION['email'], ENT_QU
           value="<?php echo $email; ?>"
           placeholder="taro@example.com"
           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <!--注釈--->
+        <p class="text-xs text-gray-400 mt-1">本当のメールアドレスは入れずにダミーにしてね！</p>
 
           <!-- エラーだった場合、hiddenクラスを外しエラーメッセージ表示 -->
         <p class="error-message text-red-500 text-sm mt-1 hidden" data-for="email"></p>

@@ -1,6 +1,6 @@
 <?php
 // ----------------------------------------------------------
-//  
+//
 // 実際にメールを送る作業をするもの
 //
 // ----------------------------------------------------------
@@ -23,17 +23,8 @@ $password = $_SESSION['password'];
 $token = bin2hex(random_bytes(32));
 
 // ③ 仮登録データをDB（MySQL）に保存する -----------------------------------------
-// DBに接続する（PDOを使用）
-$dbn  = 'mysql:dbname=member_system_db;charset=utf8mb4;port=3306;host=localhost';
-$user_db = 'root';
-$pwd  = '';
-
-try {
-    $pdo = new PDO($dbn, $user_db, $pwd);
-} catch (PDOException $e) {
-    echo json_encode(["db error" => "{$e->getMessage()}"]);
-    exit();
-}
+// DBに接続する。db_config.php（Git管理外）を読み込むと $pdo が使える
+require __DIR__ . '/db_config.php';
 
 // INSERT文で仮登録データを保存する
 // ・ユーザー入力値は直接埋め込まず、必ずバインド変数（:name など）を使う（SQLインジェクション対策）
