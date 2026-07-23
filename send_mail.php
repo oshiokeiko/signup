@@ -10,7 +10,7 @@ session_start();
 
 // セッションに値がなければ（直接アクセスなど）入力画面へ戻す
 if (empty($_SESSION['name']) || empty($_SESSION['email']) || empty($_SESSION['password'])) {
-    header('Location: index.php');
+    header('Location: signup.php');
     exit;
 }
 
@@ -141,7 +141,7 @@ session_destroy();
       </p>
     <?php endif; ?>
 
-    <a href="index.php" class="inline-block mt-6 text-blue-600 hover:underline text-sm">
+    <a href="signup.php" class="inline-block mt-6 text-blue-600 hover:underline text-sm">
       入力画面に戻る
     </a>
   </div>

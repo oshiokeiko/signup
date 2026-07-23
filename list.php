@@ -86,7 +86,7 @@ try {
       </div>
     <?php endif; ?>
 
-    <a href="index.php" class="inline-block mt-6 text-blue-600 hover:underline text-sm">入力画面へ</a>
+    <a href="signup.php" class="inline-block mt-6 text-blue-600 hover:underline text-sm">入力画面へ</a>
   </div>
 
 </body>

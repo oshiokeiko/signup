@@ -28,10 +28,11 @@
       メールアドレスの認証が完了し、<br>会員登録が正常に完了しました。
     </p>
 
-    <a href="index.php"
+    <a href="login.php"
        class="inline-block mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
-      トップへ戻る
+      ログインして記事を読む
     </a>
+    <a href="top.php" class="block mt-4 text-sm text-gray-400 hover:underline">TOPへ戻る</a>
   </div>
 
 </body>

@@ -66,7 +66,7 @@ if ($matched) {
     <p class="text-red-500 leading-relaxed">
       <?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?>
     </p>
-    <a href="index.php" class="inline-block mt-6 text-blue-600 hover:underline text-sm">
+    <a href="signup.php" class="inline-block mt-6 text-blue-600 hover:underline text-sm">
       入力画面に戻る
     </a>
   </div>

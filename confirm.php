@@ -8,7 +8,7 @@
 // セッションを開始する（入力値をページ間で引き回すために使用）
 session_start();
 
-// index.php から POST で送られてきたかチェックする。
+// signup.php から POST で送られてきたかチェックする。
 // 直接 confirm.php を開いた場合（POSTでない）は入力画面に戻す。
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // POSTで受け取った値をセッションに保存する。
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // セッションに値がなければ（直接アクセスなど）入力画面へ戻す
 if (empty($_SESSION['name']) || empty($_SESSION['email']) || empty($_SESSION['password'])) {
-    header('Location: index.php');
+    header('Location: signup.php');
     exit;
 }
 
@@ -64,10 +64,10 @@ $password = $_SESSION['password'];
       </div>
     </dl>
 
-    <!-- ボタン2つ：戻る（index.php）／登録する（send_mail.php） -->
+    <!-- ボタン2つ：戻る（signup.php）／登録する（send_mail.php） -->
     <div class="flex gap-3">
       <!-- 「戻る」：入力画面へ。セッションは残したままにして入力値を復元できるようにする -->
-      <a href="index.php"
+      <a href="signup.php"
          class="flex-1 text-center border border-gray-300 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-50 transition-colors">
         戻る
       </a>
