@@ -24,7 +24,7 @@ $token = bin2hex(random_bytes(32));
 
 // ③ 仮登録データをDB（MySQL）に保存する -----------------------------------------
 // DBに接続する。db_config.php（Git管理外）を読み込むと $pdo が使える
-require __DIR__ . '/db_config.php';
+require __DIR__ . '/includes/db_config.php';
 
 // INSERT文で仮登録データを保存する
 // ・ユーザー入力値は直接埋め込まず、必ずバインド変数（:name など）を使う（SQLインジェクション対策）
@@ -72,7 +72,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 // 接続情報（mail_config.php）を読み込む
-$mailConfig = require __DIR__ . '/mail_config.php';
+$mailConfig = require __DIR__ . '/includes/mail_config.php';
 
 // 送信できたかどうかのフラグ
 $mailResult = false;

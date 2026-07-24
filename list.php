@@ -3,7 +3,7 @@
 // ※ 開発確認用のページなので、本番ではアクセス制限をかける想定。
 
 // DBに接続する。db_config.php（Git管理外）を読み込むと $pdo が使える
-require __DIR__ . '/db_config.php';
+require __DIR__ . '/includes/db_config.php';
 
 // SELECT文で登録済みユーザーを新しい順に取得する
 // ※ deleted_at が NULL のもの（＝削除されていないもの）だけを表示する

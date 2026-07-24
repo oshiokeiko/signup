@@ -8,7 +8,7 @@
 // ==========================================================
 
 session_start();
-require __DIR__ . '/db_config.php';   // $pdo が使える
+require __DIR__ . '/includes/db_config.php';   // $pdo が使える
 
 // ① 入力を受け取る
 $email    = $_POST['email'] ?? '';

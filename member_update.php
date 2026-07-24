@@ -5,7 +5,7 @@
 // ----------------------------------------------------------
 
 // DBに接続する（db_config.php を読み込むと $pdo が使える）
-require __DIR__ . '/db_config.php';
+require __DIR__ . '/includes/db_config.php';
 
 // ① POSTの id を整数チェック。不正なら一覧へ戻す
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);

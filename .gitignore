@@ -3,11 +3,11 @@
 #  ※ ここに書いたファイルは、自分のパソコンには残ります
 # ============================================================
 
-# --- パスワードなどの秘密情報 ---
-mail_config.php
+# --- パスワードなどの秘密情報（includes/ に引っ越し済み） ---
+includes/mail_config.php
 
-# --- DB接続情報（本番のパスワード等が入るため除外。見本は db_config.php.example） ---
-db_config.php
+# --- DB接続情報（本番のパスワード等が入るため除外。見本は includes/db_config.php.example） ---
+includes/db_config.php
 
 # --- 登録された個人情報の本体（名前・メール・パスワード） ---
 data/*.csv

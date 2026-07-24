@@ -7,8 +7,8 @@
 // ==========================================================
 
 session_start();                 // ログイン状態を確認するため
-include('functions.php');         // is_login() を使う
-include('articles.php');          // $articles（記事データ）を読み込む
+include(__DIR__ . '/includes/functions.php');         // is_login() を使う
+include(__DIR__ . '/includes/articles.php');          // $articles（記事データ）を読み込む
 ?>
 <!DOCTYPE html>
 <html lang="ja">

@@ -6,8 +6,8 @@
 // ==========================================================
 
 session_start();
-include('functions.php');
-require __DIR__ . '/db_config.php';   // $pdo が使える
+include(__DIR__ . '/includes/functions.php');
+require __DIR__ . '/includes/db_config.php';   // $pdo が使える
 
 // 門番：未ログインなら追い返す
 check_login();
@@ -36,6 +36,6 @@ try {
 // ヘッダー表示用のセッションの名前も更新しておく
 $_SESSION['name'] = $name;
 
-// マイページへ戻る
-header('Location: mypage.php');
+// マイページへ戻る（updated=1 を付けて「更新できた」トーストを出す）
+header('Location: mypage.php?updated=1');
 exit;

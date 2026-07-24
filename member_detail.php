@@ -7,7 +7,7 @@
 // ----------------------------------------------------------
 
 // DBに接続する（db_config.php を読み込むと $pdo が使える）
-require __DIR__ . '/db_config.php';
+require __DIR__ . '/includes/db_config.php';
 
 // ① URLから id を受け取り、整数かどうかチェックする
 //    不正な値・未指定なら一覧へ戻す

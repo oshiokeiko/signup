@@ -7,7 +7,7 @@
 // ==========================================================
 
 session_start();
-include('functions.php');
+include(__DIR__ . '/includes/functions.php');
 
 // すでにログイン済みなら TOP へ
 if (is_login()) {

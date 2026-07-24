@@ -4,7 +4,7 @@
 //  ・title … 記事タイトル
 //  ・intro … 誰でも読める冒頭（2〜3行）※ペイウォールの手前
 //  ・body  … ログインした人だけ読める続き（段落の配列）
-//  使い方：include('articles.php'); すると $articles が使える
+//  使い方：include(__DIR__ . '/includes/articles.php'); すると $articles が使える
 // ==========================================================
 
 $articles = [

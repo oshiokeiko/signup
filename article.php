@@ -7,8 +7,8 @@
 // ==========================================================
 
 session_start();
-include('functions.php');   // is_login() を使う
-include('articles.php');    // $articles を読み込む
+include(__DIR__ . '/includes/functions.php');   // is_login() を使う
+include(__DIR__ . '/includes/articles.php');    // $articles を読み込む
 
 // ① URLから id を受け取り、整数チェック。記事が無ければ TOP へ戻す
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);

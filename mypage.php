@@ -7,8 +7,8 @@
 // ==========================================================
 
 session_start();
-include('functions.php');
-require __DIR__ . '/db_config.php';   // $pdo が使える
+include(__DIR__ . '/includes/functions.php');
+require __DIR__ . '/includes/db_config.php';   // $pdo が使える
 
 // 門番：未ログインなら login.php へ追い返す（＋id最新化）
 check_login();
@@ -41,6 +41,22 @@ if (!$user) {
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-gray-100 min-h-screen">
+
+  <?php if (($_GET['updated'] ?? '') === '1'): ?>
+    <!-- ===== 更新完了トースト（数秒で自動的に消える） ===== -->
+    <div id="toast"
+         class="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-gray-800 text-white text-sm font-semibold px-5 py-3 rounded-lg shadow-lg transition-opacity duration-500">
+      ✅ お名前を更新しました。
+    </div>
+    <script>
+      // 2.5秒後にふわっと消す
+      setTimeout(function () {
+        var t = document.getElementById('toast');
+        if (t) { t.style.opacity = '0'; }
+        setTimeout(function () { if (t) { t.remove(); } }, 500);
+      }, 2500);
+    </script>
+  <?php endif; ?>
 
   <!-- ===== ヘッダー（ログイン済み） ===== -->
   <header class="bg-white shadow-sm">

@@ -14,7 +14,7 @@ $matched = false;
 
 if (!isset($errorMessage)) {
     // ② DBに接続する。db_config.php（Git管理外）を読み込むと $pdo が使える
-    require __DIR__ . '/db_config.php';
+    require __DIR__ . '/includes/db_config.php';
 
     try {
         // ③ SELECT文でトークンが一致するレコードを探す（バインド変数で安全に照合）
