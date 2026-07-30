@@ -8,18 +8,69 @@
 
 session_start();
 include(__DIR__ . '/includes/functions.php');   // is_login() を使う
-include(__DIR__ . '/includes/articles.php');    // $articles を読み込む
+include(__DIR__ . '/includes/like_button.php'); // like_button() を使う
+require __DIR__ . '/includes/db_config.php';    // $pdo が使える
 
-// ① URLから id を受け取り、整数チェック。記事が無ければ TOP へ戻す
+// ① URLから id を受け取り、整数チェック
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if (!$id || !isset($articles[$id])) {
+if (!$id) {
     header('Location: top.php');
     exit;
 }
-$article = $articles[$id];
 
-// ② ログインしているか
+// ② 記事1件＋いいね数を取得する（集計した表を結合して一度に取る）
+$sql = 'SELECT
+          articles.*,
+          result_table.like_count
+        FROM
+          articles
+          LEFT OUTER JOIN (
+            SELECT
+              article_id,
+              COUNT(id) AS like_count
+            FROM
+              like_table
+            GROUP BY
+              article_id
+          ) AS result_table
+          ON articles.id = result_table.article_id
+        WHERE
+          articles.id = :id';
+try {
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    $article = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    exit('記事の取得に失敗しました');
+}
+
+// 記事が無ければ TOP へ戻す
+if (!$article) {
+    header('Location: top.php');
+    exit;
+}
+
+// ③ ログインしているか
 $login = is_login();
+
+// ④ 自分がこの記事をいいね済みか（ハートの色を塗り分けるため）
+$liked = false;
+if ($login) {
+    try {
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM like_table
+                               WHERE user_id = :user_id AND article_id = :article_id');
+        $stmt->bindValue(':user_id',    $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':article_id', $id,                  PDO::PARAM_INT);
+        $stmt->execute();
+        $liked = ((int)$stmt->fetchColumn() !== 0);
+    } catch (PDOException $e) {
+        $liked = false;   // 取れなくても記事表示は続ける
+    }
+}
+
+// ⑤ 続き本文を段落に分ける（DBには段落を「空行」で区切って保存している）
+$paragraphs = preg_split('/\R{2,}/u', trim($article['body']));
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -63,7 +114,7 @@ $login = is_login();
 
       <?php if ($login): ?>
         <!-- ===== ログイン済み：続きを全部表示 ===== -->
-        <?php foreach ($article['body'] as $paragraph): ?>
+        <?php foreach ($paragraphs as $paragraph): ?>
           <p class="text-gray-700 leading-loose mb-6">
             <?php echo htmlspecialchars($paragraph, ENT_QUOTES, 'UTF-8'); ?>
           </p>
@@ -97,8 +148,10 @@ $login = is_login();
         </div>
       <?php endif; ?>
 
-      <div class="mt-8 pt-6 border-t border-gray-100">
+      <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
         <a href="top.php" class="text-blue-600 hover:underline text-sm">← 一覧へ戻る</a>
+        <!-- いいねボタン（押したらこの記事に戻ってくる） -->
+        <?php echo like_button($id, $article['like_count'], $liked, 'article', $login); ?>
       </div>
     </article>
   </main>

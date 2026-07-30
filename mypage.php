@@ -3,6 +3,7 @@
 //  マイページ … ログイン必須
 //  ・自分の情報（名前・メール）を表示
 //  ・名前を変更するフォーム → mypage_update.php へ送信
+//  ・自分がいいねした記事の一覧を表示（各記事へのリンクつき）
 //  ・未ログインでURLを直打ちしても check_login() で追い返す
 // ==========================================================
 
@@ -29,6 +30,39 @@ try {
 if (!$user) {
     header('Location: logout.php');
     exit;
+}
+
+// --------------------------------------------------
+//  自分がいいねした記事の一覧を取得する
+//
+//  いいねの記録（like_table）には記事番号しか入っていないので、
+//  記事テーブル（articles）と結合してタイトルを取ってくる。
+//
+//  ここは INNER JOIN でよい。
+//  「いいねした記事だけ」を出したいので、いいねの記録が無い記事は
+//  そもそも結果に出てこなくて正しい（一覧側で LEFT OUTER JOIN を
+//  使ったのは、いいね0件の記事も消さずに並べたかったから）。
+// --------------------------------------------------
+try {
+    $sql = 'SELECT
+              articles.id,
+              articles.title,
+              articles.intro,
+              like_table.created_at AS liked_at
+            FROM
+              like_table
+              INNER JOIN articles
+                ON like_table.article_id = articles.id
+            WHERE
+              like_table.user_id = :user_id
+            ORDER BY
+              like_table.created_at DESC';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt->execute();
+    $liked_articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $liked_articles = [];   // 取れなくてもマイページ自体は表示する
 }
 ?>
 <!DOCTYPE html>
@@ -96,6 +130,37 @@ if (!$user) {
 
       <a href="top.php" class="inline-block mt-6 text-blue-600 hover:underline text-sm">← 記事一覧へ</a>
     </div>
+
+    <!-- ===== いいねした記事の一覧（クリックでその記事へ） ===== -->
+    <section class="bg-white rounded-2xl shadow-sm p-6 sm:p-8 mt-6">
+      <div class="flex items-baseline justify-between mb-4">
+        <h2 class="text-lg font-bold text-gray-800">いいねした記事</h2>
+        <span class="text-sm text-gray-500"><?php echo count($liked_articles); ?>件</span>
+      </div>
+
+      <?php if (!$liked_articles): ?>
+        <!-- 1件もないとき -->
+        <p class="text-sm text-gray-500 leading-relaxed">
+          まだいいねした記事はありません。<br>
+          <a href="top.php" class="text-blue-600 hover:underline font-semibold">記事一覧</a> でハートを押すと、ここにたまっていきます。
+        </p>
+
+      <?php else: ?>
+        <ul class="divide-y divide-gray-100">
+          <?php foreach ($liked_articles as $liked): ?>
+            <li class="py-3 first:pt-0 last:pb-0">
+              <a href="article.php?id=<?php echo (int)$liked['id']; ?>"
+                 class="text-blue-600 hover:underline font-semibold text-sm leading-snug">
+                <?php echo htmlspecialchars($liked['title'], ENT_QUOTES, 'UTF-8'); ?>
+              </a>
+              <p class="text-xs text-gray-400 mt-1">
+                ♥ <?php echo date('Y年n月j日', strtotime($liked['liked_at'])); ?>
+              </p>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+    </section>
   </main>
 
 </body>
